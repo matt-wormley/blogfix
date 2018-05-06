@@ -52,6 +52,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         var imgParagraph = document.createElement('p');
         var img = document.createElement('img');
         img.id = "blogfixPreview";
+				img.width = "250";
+				img.height = "250";
         fixdiv.appendChild(img);
 
         console.log("success");
