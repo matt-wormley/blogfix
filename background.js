@@ -14,18 +14,23 @@ fetch('https://raw.githubusercontent.com/matt-wormley/blogfix/master/picture_ind
     var pictureIndex = {};
     var datePuller = /\((.*)\)/;
     for (let i = 0; i < trElements.length; i++) {
-      const filename = trElements[i].children[0].textContent.trim().toLowerCase();
-      const hrefURL = new URL(trElements[i].children[1].children[0].href);
-      const title = trElements[i].children[1].children[0].textContent;
-      const date = title.match(datePuller)[1]
+      var firstTd = trElements[i].children[0]
+      var aElements = trElements[i].children[1].getElementsByTagName('a');
 
-      if (!pictureIndex.hasOwnProperty(filename)) {
-        pictureIndex[filename] = [];
+      const filename = firstTd.textContent.trim().toLowerCase();
+      var pictureData = [];
+
+      for (let j = 0; j < aElements.length; j++) {
+        const hrefURL = new URL(aElements[j].href);
+        const title = aElements[j].textContent;
+        const date = title.match(datePuller)[1]
+
+        pictureData.push({
+          picturePath: hrefURL.pathname.substring(1),
+          date: date
+        });
       }
-      pictureIndex[filename].push({
-        picturePath: hrefURL.pathname.substring(1),
-        date: date
-      });
+      pictureIndex[filename] = pictureData;
     }
 
     console.log("DONE");
