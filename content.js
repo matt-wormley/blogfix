@@ -39,13 +39,16 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           fixdiv.appendChild(dates);
 
           for (p in pictureData) {
-            var date = document.createElement('li');
-            var a = document.createElement('a');
-            a.textContent = filename + " taken " + pictureData[p].date;
-            a.onmouseover = () => { document.getElementById('blogfixPreview').src ='http://localhost:8887/' +  pictureData[p].picturePath; }
-            a.onmouseout = () => { document.getElementById('blogfixPreview').src = 'http://localhost:8887/1x1.png'; }
-            date.appendChild(a);
-            dates.appendChild(date);
+						function setupA(pictureData) {
+							var date = document.createElement('li');
+							var a = document.createElement('a');
+							a.textContent = filename + " taken " + pictureData.date;
+							a.onmouseover = () => { document.getElementById('blogfixPreview').src ='http://localhost:8887/' +  pictureData.picturePath; };
+							a.onmouseout = () => { document.getElementById('blogfixPreview').src = 'http://localhost:8887/1x1.png'; };
+							date.appendChild(a);
+							dates.appendChild(date);
+						}
+						setupA(pictureData[p]);
           }
         }
 
