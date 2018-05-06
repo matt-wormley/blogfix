@@ -16,9 +16,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           sendResponse({retry: true});
           return;
         }
+        var filenameExtractor = /([^/%]*)(%.*)?(\.[a-z]*)$/;
+
         var scrape = anchorElements.map((a,i) => {
+          var filenameParts = a.href.match(filenameExtractor);
+          var filename = filenameParts[1] + filenameParts[3];
+
           return {
-            href: a.href,
+            filename: filename.toLowerCase(),
             alt: imgElements[i].alt.toLowerCase()
           };
         });
@@ -28,7 +33,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         insertInDiv.appendChild(fixdiv);
 
         for (s in scrape) {
-          var filename = scrape[s].alt + '.jpg';
+          var filename = scrape[s].filename;
           var pictureData = pictureIndex[filename];
 
           var title = document.createElement('p');
@@ -39,24 +44,24 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           fixdiv.appendChild(dates);
 
           for (p in pictureData) {
-						function setupA(pictureData) {
-							var date = document.createElement('li');
-							var a = document.createElement('a');
-							a.textContent = filename + " taken " + pictureData.date;
-							a.onmouseover = () => { document.getElementById('blogfixPreview').src ='http://localhost:8887/' +  pictureData.picturePath; };
-							a.onmouseout = () => { document.getElementById('blogfixPreview').src = 'http://localhost:8887/1x1.png'; };
-							date.appendChild(a);
-							dates.appendChild(date);
-						}
-						setupA(pictureData[p]);
+            function setupA(pictureData) {
+              var date = document.createElement('li');
+              var a = document.createElement('a');
+              a.textContent = filename + " taken " + pictureData.date;
+              a.onmouseover = () => { document.getElementById('blogfixPreview').src ='http://localhost:8887/' +  pictureData.picturePath; };
+              a.onmouseout = () => { document.getElementById('blogfixPreview').src = 'http://localhost:8887/1x1.png'; };
+              date.appendChild(a);
+              dates.appendChild(date);
+            }
+            setupA(pictureData[p]);
           }
         }
 
         var imgParagraph = document.createElement('p');
         var img = document.createElement('img');
         img.id = "blogfixPreview";
-				img.width = "250";
-				img.height = "250";
+        img.width = "250";
+        img.height = "250";
         fixdiv.appendChild(img);
 
         console.log("success");
