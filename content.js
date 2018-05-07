@@ -1,11 +1,15 @@
 // Listen for messages
-filenameExtractor = /([^/%]*)(%.*)?(\.[a-z]*)$/;
 function extractFilenameFromURL(url) {
   const imgURL = new URL(url);
-  var filenameParts = decodeURIComponent(imgURL.pathname).match(filenameExtractor);
-  var filename = filenameParts[1].replace("_thumb", "") + filenameParts[3];
+  var filename = imgURL.pathname.split('/').pop();
+  var filename = decodeURIComponent(decodeURIComponent(decodeURIComponent(filename)));
+  filename = filename.replace("_thumb", "").replace(/\[.*\]/,"").replace(/\+/g, " ").toLowerCase();
 
-  return filename.toLowerCase();
+  if (!filename.match(/\./)) {
+    filename = filename + '.jpg';
+  }
+
+  return filename;
 }
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
@@ -77,7 +81,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
       fixdiv.appendChild(img);
 
       var repairButton = document.createElement('div');
-      repairButton.textContent = "* Repair Corrupt Links *"
+      repairButton.textContent = "[[[Repair Corrupt Links]]]";
       repairButton.onclick = () => {
         var postHtml = document.getElementById('postingHtmlBox').value;
         var parser = new DOMParser();
@@ -89,9 +93,16 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           if (e.tagName == "A" && e.children.length == 1 && e.children[0].tagName == "IMG") {
             var img = e.children[0];
             var filename = extractFilenameFromURL(e.href);
-            replacements[filename] = {
+            var filenameParts = filename.match(/([0-9]*) (.*) ([^/]*)/);
+
+            if (!filenameParts) {
+              alert("Unable to parse the number, description, and image name from filename: " + filename);
+            }
+            replacements[filenameParts[3]] = {
               a_href: e.href,
-              img_src: img.src
+              img_src: img.src,
+              img_ordinal: filenameParts[1],
+              title: filenameParts[2]
             };
             post.removeChild(e);
           } else {
@@ -106,6 +117,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           if (filename in replacements && a.children.length == 1 && a.children[0].tagName == "IMG") {
             a.href = replacements[filename].a_href;
             a.children[0].src = replacements[filename].img_src;
+            a.children[0].title = replacements[filename].title;
+            a.children[0].alt = replacements[filename].title;
           }
         }
 
