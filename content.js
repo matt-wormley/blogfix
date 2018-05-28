@@ -93,7 +93,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           if (e.tagName == "A" && e.children.length == 1 && e.children[0].tagName == "IMG") {
             var img = e.children[0];
             var filename = extractFilenameFromURL(e.href);
-            var filenameParts = filename.match(/(.*) ([^/]*)/);
+            var filenameParts = filename.match(/([0-9]*) (.*) ([^/]*)/);
 
             if (!filenameParts) {
               alert("Unable to parse the number, description, and image name from filename: " + filename);
