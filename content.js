@@ -3,7 +3,7 @@ function extractFilenameFromURL(url) {
   const imgURL = new URL(url);
   var filename = imgURL.pathname.split('/').pop();
   var filename = decodeURIComponent(decodeURIComponent(decodeURIComponent(filename)));
-  filename = filename.replace("_thumb", "").replace(/\[.*\]/,"").replace(/\+/g, " ").toLowerCase();
+  filename = filename.replace("_thumb", "").replace(/\[.*\]/,"").replace(/\+/g, " ");
 
   if (!filename.match(/\./)) {
     filename = filename + '.jpg';
@@ -32,7 +32,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
       var scrape = imgElements.map((img) => {
         return {
-          filename: extractFilenameFromURL(img.src)
+          filename: extractFilenameFromURL(img.src).toLowerCase()
         };
       });
 
@@ -93,16 +93,15 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           if (e.tagName == "A" && e.children.length == 1 && e.children[0].tagName == "IMG") {
             var img = e.children[0];
             var filename = extractFilenameFromURL(e.href);
-            var filenameParts = filename.match(/([0-9]*) (.*) ([^/]*)/);
+            var filenameParts = filename.match(/(.*) ([^/]*)/);
 
             if (!filenameParts) {
               alert("Unable to parse the number, description, and image name from filename: " + filename);
             }
-            replacements[filenameParts[3]] = {
+            replacements[filenameParts[2].toLowerCase()] = {
               a_href: e.href,
               img_src: img.src,
-              img_ordinal: filenameParts[1],
-              title: filenameParts[2]
+              title: filenameParts[1]
             };
             post.removeChild(e);
           } else {
@@ -113,9 +112,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         var anchorElements = Array.from(post.getElementsByTagName('a'));
         for (let i = 0; i < anchorElements.length; i++) {
           a = anchorElements[i];
-          filename = extractFilenameFromURL(a.href);
+          filename = extractFilenameFromURL(a.href).toLowerCase();
           if (filename in replacements && a.children.length == 1 && a.children[0].tagName == "IMG") {
             a.href = replacements[filename].a_href;
+            a.setAttribute('style', 'background-image: none; border-bottom: 0px; border-left: 0px; border-right: 0px; border-top: 0px; display: inline; margin: 0px 0px 0px 2px; padding-left: 0px; padding-right: 0px; padding-top: 0px;');
             a.children[0].src = replacements[filename].img_src;
             a.children[0].title = replacements[filename].title;
             a.children[0].alt = replacements[filename].title;
