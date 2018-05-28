@@ -98,10 +98,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             if (!filenameParts) {
               alert("Unable to parse the number, description, and image name from filename: " + filename);
             }
-            replacements[filenameParts[3].toLowerCase()] = {
+            filename = filenameParts[3].toLowerCase();
+            replacements[filename] = {
               a_href: e.href,
               img_src: img.src,
-              title: filenameParts[2]
+              title: filenameParts[2] + " " + filename
             };
             post.removeChild(e);
           } else {
