@@ -115,10 +115,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           filename = extractFilenameFromURL(a.href).toLowerCase();
           if (filename in replacements && a.children.length == 1 && a.children[0].tagName == "IMG") {
             a.href = replacements[filename].a_href;
-            a.setAttribute('style', 'background-image: none; border-bottom: 0px; border-left: 0px; border-right: 0px; border-top: 0px; display: inline; margin: 0px 0px 0px 2px; padding-left: 0px; padding-right: 0px; padding-top: 0px;');
             a.children[0].src = replacements[filename].img_src;
             a.children[0].title = replacements[filename].title;
             a.children[0].alt = replacements[filename].title;
+            a.children[0].setAttribute('style', 'background-image: none; border-bottom: 0px; border-left: 0px; border-right: 0px; border-top: 0px; display: inline; margin: 0px 0px 0px 2px; padding-left: 0px; padding-right: 0px; padding-top: 0px;');
           }
         }
 
