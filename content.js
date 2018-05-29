@@ -102,7 +102,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             replacements[filename] = {
               a_href: e.href,
               img_src: img.src,
-              title: filenameParts[2] + " " + filename
+              title: filenameParts[2] + " " + filename.split('.')[0].toUpperCase()
             };
             post.removeChild(e);
           } else {
